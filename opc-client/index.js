@@ -27,7 +27,7 @@ async function lightWeightOPCClient({
   timestampField = '',
   monitorTime = 10 * 1000,
 }) {
-  if (!endpointUrl || !nodeid) {
+  if (!endpointUrl || !nodeId) {
     throw Error('Please provide endpointUrl and nodeId');
   }
   let isInsertToDatabase = false;
