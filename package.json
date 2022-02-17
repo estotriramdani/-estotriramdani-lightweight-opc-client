@@ -1,6 +1,6 @@
 {
-  "name": "@estotriramdani/lightweight-opc-client",
-  "version": "0.1.14",
+  "name": "lightweight-opc-client",
+  "version": "0.1.15",
   "description": "Simple OPC client for node.js",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/estotriramdani/-estotriramdani-lightweight-opc-client.git"
+    "url": "https://github.com/estotriramdani/lightweight-opc-client.git"
   },
   "publishConfig": {
     "access": "public"
