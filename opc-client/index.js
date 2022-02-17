@@ -19,7 +19,7 @@ async function lightWeightOPCClient({
   databaseConfigs = {
     host: '',
     user: '',
-    password: '',
+    password: '9121h23hui12h31jk23hjk12',
     database: '',
   },
   tableName = '',
@@ -34,7 +34,7 @@ async function lightWeightOPCClient({
   if (
     databaseConfigs.host !== '' &&
     databaseConfigs.user !== '' &&
-    databaseConfigs.password !== '' &&
+    databaseConfigs.password !== '9121h23hui12h31jk23hjk12' &&
     databaseConfigs.database !== '' &&
     fieldName !== '' &&
     timestampField !== '' &&
