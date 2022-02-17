@@ -1,6 +1,6 @@
 {
   "name": "lightweight-opc-client",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "Simple OPC client for node.js",
   "main": "index.js",
   "scripts": {
@@ -20,6 +20,18 @@
     "type": "git",
     "url": "https://github.com/estotriramdani/lightweight-opc-client.git"
   },
+  "keywords": [
+    "opcua",
+    "opc-client",
+    "opc-server",
+    "opc-ua",
+    "opc",
+    "opc-ua-client",
+    "opc-ua-server",
+    "cli-app",
+    "node-red"
+  ],
+  "author": "Esto Triramdani N <estolagi@gmail.com>",
   "publishConfig": {
     "access": "public"
   }
