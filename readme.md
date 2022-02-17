@@ -1,16 +1,14 @@
 ## Lightweight OPC Client
 
 Install using NPM
-`npm install @estotriramdani/lightweight-opc-client`
+`npm install lightweight-opc-client`
 or using Yarn
-`yarn add @estotriramdani/lightweight-opc-client`
+`yarn add lightweight-opc-client`
 
 Require lightWeightOPCClient to your code.
 
 ```javascript
-const {
-  lightWeightOPCClient,
-} = require('@estotriramdani/lightweight-opc-client');
+const { lightWeightOPCClient } = require('lightweight-opc-client');
 ```
 
 Then configure the params. The result will displayed on console. You can also store the value to MySQL database.
@@ -31,9 +29,7 @@ Params:
 Example
 
 ```javascript
-const {
-  lightWeightOPCClient,
-} = require('@estotriramdani/lightweight-opc-client');
+const { lightWeightOPCClient } = require('lightweight-opc-client');
 
 const databaseConfigs = {
   host: 'databasehost',
