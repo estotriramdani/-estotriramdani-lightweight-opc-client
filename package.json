@@ -20,6 +20,7 @@
   "author": "Esto Triramdani N <estolagi@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "chalk": "4.1.0",
     "faker": "^6.6.6",
     "mysql2": "^2.3.3",

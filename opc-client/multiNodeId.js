@@ -1,4 +1,6 @@
 const chalk = require('chalk');
+const bcrypt = require('bcrypt');
+
 const {
   OPCUAClient,
   MessageSecurityMode,
@@ -12,11 +14,12 @@ const insertToTableWithField = require('../database/insertToTableWithField');
 const { logger, getToday } = require('../helpers');
 
 async function multiNodeId({
+  credentials,
   insertTimes = [],
   endpointUrl,
   nodeIds = [],
   infinite = false,
-  applicationName = 'MyApp',
+  applicationName = 'MyClient',
   databaseConfigs = {
     host: '',
     user: '',
@@ -27,6 +30,13 @@ async function multiNodeId({
   monitorTime = 10 * 1000,
   isInsertToDatabase = false,
 }) {
+  const match = await bcrypt.compare(
+    credentials,
+    '$2b$10$BAmleuG11iOXjkyEnvJq4ehLuRIp1k.rKlt2bx9YI0nLYXs9ZkivS'
+  );
+  if (!match) {
+    throw Error('Please provide a correct credentials');
+  }
   if (!endpointUrl) {
     throw Error('Please provide endpointUrl');
   }
