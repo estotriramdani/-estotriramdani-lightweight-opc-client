@@ -48,7 +48,7 @@ async function lightWeightOPCClient({
   };
   const options = {
     applicationName,
-    connectionStrategy: connectionStrategy,
+    connectionStrategy,
     securityMode: MessageSecurityMode.None,
     securityPolicy: SecurityPolicy.None,
     endpointMustExist: true,
@@ -60,13 +60,6 @@ async function lightWeightOPCClient({
 
   const session = await client.createSession();
   console.log('session created!');
-
-  const browseResult = await session.browse('RootFolder');
-
-  console.log('references of RootFolder :');
-  for (const reference of browseResult.references) {
-    console.log('   -> ', reference.browseName.toString());
-  }
 
   const value = 0;
   const nodeToRead = {
@@ -86,7 +79,7 @@ async function lightWeightOPCClient({
   });
 
   subscription
-    .on('started', function () {
+    .on('started', () => {
       console.log(
         'subscription started for 2 seconds - subscriptionId=',
         subscription.subscriptionId
@@ -100,12 +93,12 @@ async function lightWeightOPCClient({
         logger(chalk.green(`Table name => ${tableName}`));
       }
     })
-    .on('keepalive', function () {
+    .on('keepalive', () => {
       console.log(chalk.bgYellow.black('No value change occurs. Keep alive.'));
     })
-    .on('terminated', function () {
+    .on('terminated', () => {
       console.log('terminated');
-      return;
+      return null;
     });
 
   const itemToMonitor = {
@@ -125,10 +118,10 @@ async function lightWeightOPCClient({
     TimestampsToReturn.Both
   );
 
-  monitoredItem.on('changed', async (dataValue) => {
+  monitoredItem.on('changed', async (dValue) => {
     console.log(
       chalk.bgWhite.cyan(`[${getToday()}]`),
-      chalk.bgCyan.black(`New value: ${dataValue.value}`)
+      chalk.bgCyan.black(`New value: ${dValue.value}`)
     );
     if (isInsertToDatabase) {
       try {
@@ -136,7 +129,7 @@ async function lightWeightOPCClient({
           databaseConfigs,
           tableName,
           fieldName,
-          value: dataValue.value.value,
+          value: dValue.value.value,
           timestampField,
         });
         console.log(data);
@@ -153,9 +146,10 @@ async function lightWeightOPCClient({
   });
 
   if (!infinite) {
-    async function timeout(ms) {
-      return new Promise((resolve) => setTimeout(resolve, ms));
-    }
+    const timeout = async (ms) => {
+      const promise = new Promise((resolve) => setTimeout(resolve, ms));
+      return promise;
+    };
     await timeout(monitorTime);
 
     console.log('now terminating subscription');
@@ -167,7 +161,7 @@ async function lightWeightOPCClient({
     // disconnecting
     await client.disconnect();
     console.log('done !');
-    return;
+    return null;
   }
 }
 
