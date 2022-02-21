@@ -12,7 +12,7 @@ const insertToTableWithField = require('../database/insertToTableWithField');
 const { logger, getToday } = require('../helpers');
 
 async function multiNodeId({
-  insertTime = [],
+  insertTimes = [],
   endpointUrl,
   nodeIds = [],
   infinite = false,
@@ -84,7 +84,7 @@ async function multiNodeId({
           logger(
             chalk.bgGreen.white(
               `The value will be stored to database ${
-                insertTime !== '-' ? `at ${insertTime}` : ''
+                insertTimes !== '-' ? `at ${insertTimes}` : ''
               }.`
             )
           );
@@ -132,9 +132,9 @@ async function multiNodeId({
       );
       if (isInsertToDatabase) {
         try {
-          if (insertTime.length !== 0) {
+          if (insertTimes.length !== 0) {
             const currentTime = getToday().substring(11);
-            if (insertTime.includes(currentTime)) {
+            if (insertTimes.includes(currentTime)) {
               const data = await insertToTableWithField({
                 databaseConfigs,
                 tableName,
