@@ -56,7 +56,7 @@ async function lightWeightOPCClient({
 
   const client = OPCUAClient.create(options);
   await client.connect(endpointUrl);
-  console.log(chalk.bgBlue.cyan('Connected to OPC!'));
+  console.log(chalk.cyan('Connected to OPC!'));
 
   const session = await client.createSession();
   console.log('session created!');
@@ -128,7 +128,7 @@ async function lightWeightOPCClient({
   monitoredItem.on('changed', async (dataValue) => {
     console.log(
       chalk.bgWhite.cyan(`[${getToday()}]`),
-      chalk.bgCyan.white(`New value: ${dataValue.value}`)
+      chalk.bgCyan.black(`New value: ${dataValue.value}`)
     );
     if (isInsertToDatabase) {
       try {
