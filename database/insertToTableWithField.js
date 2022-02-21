@@ -29,13 +29,12 @@ const insertToTableWithField = async ({
         query: queryInsert,
       });
       return { query: queryInsert, result };
-    } else {
-      const result = await queryBuiler({
-        databaseConfigs,
-        query: queryUpdate,
-      });
-      return { query: queryUpdate, result };
     }
+    const result = await queryBuiler({
+      databaseConfigs,
+      query: queryUpdate,
+    });
+    return { query: queryUpdate, result };
   }
   return null;
 };

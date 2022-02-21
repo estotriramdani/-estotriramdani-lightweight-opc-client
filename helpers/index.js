@@ -1,5 +1,6 @@
 const transformToTwoDigits = ({ number }) => {
-  return number.toLocaleString('en-US', { minimumIntegerDigits: 2 });
+  const value = number.toLocaleString('en-US', { minimumIntegerDigits: 2 });
+  return value;
 };
 
 const getToday = () => {
@@ -14,8 +15,6 @@ const getToday = () => {
   return `${year}-${month}-${date} ${hour}:${minute}:${second}`;
 };
 
-const logger = (message) => {
-  return console.log(message);
-};
+const logger = (message) => console.log(message);
 
 module.exports = { getToday, transformToTwoDigits, logger };

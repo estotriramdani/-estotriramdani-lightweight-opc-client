@@ -62,7 +62,9 @@ async function multiNodeId({
     const dataValue = await session.read(nodeToRead, value);
 
     console.log(
-      `Value of ${aliases} -> ${chalk.bgBlue.white(dataValue.value.value)}`
+      `Initial value of ${chalk.bgRed.white(aliases)} -> ${chalk.bgBlue.white(
+        dataValue.value.value
+      )}`
     );
 
     const subscription = ClientSubscription.create(session, {

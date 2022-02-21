@@ -1,6 +1,6 @@
 {
   "name": "lightweight-opc-client",
-  "version": "0.1.17",
+  "version": "0.1.27",
   "description": "Simple OPC client for node.js",
   "main": "index.js",
   "scripts": {
@@ -22,7 +22,7 @@
   "dependencies": {
     "chalk": "4.1.0",
     "faker": "^6.6.6",
-    "mysql": "^2.18.1",
+    "mysql2": "^2.3.3",
     "node-opcua": "^2.62.7",
     "node-opcua-client": "^2.62.7"
   },
