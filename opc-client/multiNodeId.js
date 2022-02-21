@@ -12,8 +12,9 @@ const insertToTableWithField = require('../database/insertToTableWithField');
 const { logger, getToday } = require('../helpers');
 
 async function multiNodeId({
+  insertTime = [],
   endpointUrl,
-  nodeIds = [{ nodeId: '', fieldName: '' }],
+  nodeIds = [],
   infinite = false,
   applicationName = 'MyApp',
   databaseConfigs = {
@@ -22,13 +23,12 @@ async function multiNodeId({
     password: '9121h23hui12h31jk23hjk12',
     database: '',
   },
-  tableName = '',
   timestampField = '',
   monitorTime = 10 * 1000,
   isInsertToDatabase = false,
 }) {
   if (!endpointUrl) {
-    throw Error('Please provide endpointUrl and nodeId');
+    throw Error('Please provide endpointUrl');
   }
   const connectionStrategy = {
     initialDelay: 1000,
@@ -36,7 +36,7 @@ async function multiNodeId({
   };
   const options = {
     applicationName,
-    connectionStrategy: connectionStrategy,
+    connectionStrategy,
     securityMode: MessageSecurityMode.None,
     securityPolicy: SecurityPolicy.None,
     endpointMustExist: true,
@@ -49,20 +49,21 @@ async function multiNodeId({
   const session = await client.createSession();
   console.log('session created!');
 
-  const browseResult = await session.browse('RootFolder');
-
-  console.log('references of RootFolder :');
-  for (const reference of browseResult.references) {
-    console.log('   -> ', reference.browseName.toString());
+  if (!nodeIds || nodeIds.length === 0) {
+    await client.disconnect();
+    throw Error('Please provide at least one nodeId');
   }
-  nodeIds.forEach(async ({ nodeId, fieldName }) => {
+  nodeIds.forEach(async ({ nodeId, fieldName, tableName, aliases }) => {
     const value = 0;
     const nodeToRead = {
       nodeId,
       attributeId: AttributeIds.Value,
     };
     const dataValue = await session.read(nodeToRead, value);
-    console.log('Value ', typeof dataValue.value);
+
+    console.log(
+      `Value of ${aliases} -> ${chalk.bgBlue.white(dataValue.value.value)}`
+    );
 
     const subscription = ClientSubscription.create(session, {
       requestedPublishingInterval: 1000,
@@ -74,28 +75,36 @@ async function multiNodeId({
     });
 
     subscription
-      .on('started', function () {
+      .on('started', () => {
         console.log(
           'subscription started for 2 seconds - subscriptionId=',
           subscription.subscriptionId
         );
         if (isInsertToDatabase) {
-          logger(chalk.bgGreen.white('The value will be stored to database.'));
-          logger(chalk.green(`Host => ${databaseConfigs.host}`));
-          logger(chalk.green(`Database => ${databaseConfigs.database}`));
+          logger(
+            chalk.bgGreen.white(
+              `The value will be stored to database ${
+                insertTime !== '-' ? `at ${insertTime}` : ''
+              }.`
+            )
+          );
           logger(chalk.green(`Fieldname => ${fieldName}`));
           logger(chalk.green(`Timestamp field => ${timestampField}`));
           logger(chalk.green(`Table name => ${tableName}`));
+          logger(chalk.cyan('--------------------------------------'));
         }
       })
-      .on('keepalive', function () {
+      .on('keepalive', () => {
         console.log(
-          chalk.bgYellow.black('No value change occurs. Keep alive.')
+          chalk.bgWhite.black(`[${getToday()}]`),
+          chalk.bgYellow.black(
+            `[${aliases}] No value change occurs. Keep alive.`
+          )
         );
       })
-      .on('terminated', function () {
+      .on('terminated', () => {
         console.log('terminated');
-        return;
+        return null;
       });
 
     const itemToMonitor = {
@@ -115,37 +124,64 @@ async function multiNodeId({
       TimestampsToReturn.Both
     );
 
-    monitoredItem.on('changed', async (dataValue) => {
+    monitoredItem.on('changed', async (dValue) => {
       console.log(
-        chalk.bgWhite.cyan(`[${getToday()}]`),
-        chalk.bgCyan.black(`New value: ${dataValue.value}`)
+        chalk.bgWhite.black(`[${getToday()}]`),
+        chalk.bgWhite.blue(`[${aliases}]`),
+        chalk.bgCyan.black(`New value: ${dValue.value}`)
       );
       if (isInsertToDatabase) {
         try {
-          const data = await insertToTableWithField({
-            databaseConfigs,
-            tableName,
-            fieldName,
-            value: dataValue.value.value,
-            timestampField,
-          });
-          console.log(data);
-          console.log(
-            chalk.bgGreen.white('Value was successfully inserted to database!')
-          );
-          console.log(
-            chalk.white('--------------------------------------------')
-          );
+          if (insertTime.length !== 0) {
+            const currentTime = getToday().substring(11);
+            if (insertTime.includes(currentTime)) {
+              const data = await insertToTableWithField({
+                databaseConfigs,
+                tableName,
+                fieldName,
+                value: dValue.value.value,
+                timestampField,
+              });
+              console.log(data);
+              console.log(
+                chalk.bgGreen.black(
+                  `Value was successfully inserted to database ${fieldName} with value ${dValue.value.value}!`
+                )
+              );
+              console.log(
+                chalk.white('--------------------------------------------')
+              );
+            }
+          } else {
+            const data = await insertToTableWithField({
+              databaseConfigs,
+              tableName,
+              fieldName,
+              value: dValue.value.value,
+              timestampField,
+            });
+            console.log(data);
+            console.log(
+              chalk.bgGreen.black(
+                `Value was successfully inserted to database ${fieldName} with value ${dValue.value.value}!`
+              )
+            );
+            console.log(
+              chalk.white('--------------------------------------------')
+            );
+          }
         } catch (error) {
+          await client.disconnect();
           throw Error(error);
         }
       }
     });
 
     if (!infinite) {
-      async function timeout(ms) {
-        return new Promise((resolve) => setTimeout(resolve, ms));
-      }
+      const timeout = async (ms) => {
+        const promise = new Promise((resolve) => setTimeout(resolve, ms));
+        return promise;
+      };
       await timeout(monitorTime);
 
       console.log('now terminating subscription');
@@ -157,7 +193,7 @@ async function multiNodeId({
       // disconnecting
       await client.disconnect();
       console.log('done !');
-      return;
+      return null;
     }
   });
 }

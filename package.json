@@ -6,20 +6,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "chalk": "4.1.0",
-    "faker": "^6.6.6",
-    "mysql": "^2.18.1",
-    "node-opcua": "^2.62.7",
-    "node-opcua-client": "^2.62.7"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/estotriramdani/lightweight-opc-client.git"
-  },
   "keywords": [
     "opcua",
     "opc-client",
@@ -32,7 +18,24 @@
     "node-red"
   ],
   "author": "Esto Triramdani N <estolagi@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "4.1.0",
+    "faker": "^6.6.6",
+    "mysql": "^2.18.1",
+    "node-opcua": "^2.62.7",
+    "node-opcua-client": "^2.62.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/estotriramdani/lightweight-opc-client.git"
+  },
   "publishConfig": {
     "access": "public"
+  },
+  "devDependencies": {
+    "eslint": "^8.9.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.4"
   }
 }
