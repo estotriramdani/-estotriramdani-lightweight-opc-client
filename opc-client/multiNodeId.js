@@ -86,6 +86,9 @@ async function multiNodeId({
       priority: 10,
     });
 
+    let currentValue = dataValue.value.value;
+    const values = [currentValue];
+
     subscription
       .on('started', () => {
         console.log(
@@ -106,7 +109,32 @@ async function multiNodeId({
           logger(chalk.cyan('--------------------------------------'));
         }
       })
-      .on('keepalive', () => {
+      .on('keepalive', async () => {
+        if (values.length > 1) {
+          const prevValue = values[values.length - 2];
+          console.log(
+            chalk.bgRed.white(`[${aliases}] Prev. Value: ${prevValue}`)
+          );
+          const currentTime = getToday().substring(11);
+          if (insertTimes.includes(currentTime)) {
+            const data = await insertToTableWithField({
+              databaseConfigs,
+              tableName,
+              fieldName,
+              value: prevValue,
+              timestampField,
+            });
+            console.log(data);
+            console.log(
+              chalk.bgGreen.black(
+                `Previous value was successfully inserted to database ${fieldName} with value ${prevValue}!`
+              )
+            );
+            console.log(
+              chalk.white('--------------------------------------------')
+            );
+          }
+        }
         console.log(
           chalk.bgWhite.black(`[${getToday()}]`),
           chalk.bgYellow.black(
@@ -137,6 +165,8 @@ async function multiNodeId({
     );
 
     monitoredItem.on('changed', async (dValue) => {
+      currentValue = dValue.value.value;
+      values.push(currentValue);
       console.log(
         chalk.bgWhite.black(`[${getToday()}]`),
         chalk.bgWhite.blue(`[${aliases}]`),
