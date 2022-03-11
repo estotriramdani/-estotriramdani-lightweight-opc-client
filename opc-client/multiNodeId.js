@@ -207,7 +207,7 @@ async function multiNodeId({
               );
             }
           } else {
-            const intervalInsert = setInterval(async () => {
+            setInterval(async () => {
               const data = await insertToTableWithField({
                 databaseConfigs,
                 tableName,
@@ -227,9 +227,6 @@ async function multiNodeId({
                 chalk.white('--------------------------------------------')
               );
             }, insertInterval);
-            if (!infinite) {
-              clearInterval(intervalInsert);
-            }
           }
         } catch (error) {
           await client.disconnect();
