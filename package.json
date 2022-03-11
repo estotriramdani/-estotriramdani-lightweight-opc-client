@@ -1,6 +1,6 @@
 {
   "name": "lightweight-opc-client",
-  "version": "0.1.28",
+  "version": "0.1.29",
   "description": "Simple OPC client for node.js",
   "main": "index.js",
   "scripts": {

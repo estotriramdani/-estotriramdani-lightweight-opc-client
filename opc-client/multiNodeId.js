@@ -29,6 +29,8 @@ async function multiNodeId({
   timestampField = '',
   monitorTime = 10 * 1000,
   isInsertToDatabase = false,
+  insertInterval = 1000,
+  showConsole = false,
 }) {
   const match = await bcrypt.compare(
     credentials,
@@ -112,9 +114,11 @@ async function multiNodeId({
       .on('keepalive', async () => {
         if (values.length > 1) {
           const prevValue = values[values.length - 2];
-          console.log(
-            chalk.bgRed.white(`[${aliases}] Prev. Value: ${prevValue}`)
-          );
+          if (showConsole) {
+            console.log(
+              chalk.bgRed.white(`[${aliases}] Prev. Value: ${prevValue}`)
+            );
+          }
           const currentTime = getToday().substring(11);
           if (insertTimes.includes(currentTime)) {
             const data = await insertToTableWithField({
@@ -124,7 +128,9 @@ async function multiNodeId({
               value: prevValue,
               timestampField,
             });
-            console.log(data);
+            if (showConsole) {
+              console.log(data);
+            }
             console.log(
               chalk.bgGreen.black(
                 `Previous value was successfully inserted to database ${fieldName} with value ${prevValue}!`
@@ -135,12 +141,14 @@ async function multiNodeId({
             );
           }
         }
-        console.log(
-          chalk.bgWhite.black(`[${getToday()}]`),
-          chalk.bgYellow.black(
-            `[${aliases}] No value change occurs. Keep alive.`
-          )
-        );
+        if (showConsole) {
+          console.log(
+            chalk.bgWhite.black(`[${getToday()}]`),
+            chalk.bgYellow.black(
+              `[${aliases}] No value change occurs. Keep alive.`
+            )
+          );
+        }
       })
       .on('terminated', () => {
         console.log('terminated');
@@ -167,11 +175,13 @@ async function multiNodeId({
     monitoredItem.on('changed', async (dValue) => {
       currentValue = dValue.value.value;
       values.push(currentValue);
-      console.log(
-        chalk.bgWhite.black(`[${getToday()}]`),
-        chalk.bgWhite.blue(`[${aliases}]`),
-        chalk.bgCyan.black(`New value: ${dValue.value}`)
-      );
+      if (showConsole) {
+        console.log(
+          chalk.bgWhite.black(`[${getToday()}]`),
+          chalk.bgWhite.blue(`[${aliases}]`),
+          chalk.bgCyan.black(`New value: ${dValue.value}`)
+        );
+      }
       if (isInsertToDatabase) {
         try {
           if (insertTimes.length !== 0) {
@@ -184,7 +194,9 @@ async function multiNodeId({
                 value: dValue.value.value,
                 timestampField,
               });
-              console.log(data);
+              if (showConsole) {
+                console.log(data);
+              }
               console.log(
                 chalk.bgGreen.black(
                   `Value was successfully inserted to database ${fieldName} with value ${dValue.value.value}!`
@@ -195,22 +207,29 @@ async function multiNodeId({
               );
             }
           } else {
-            const data = await insertToTableWithField({
-              databaseConfigs,
-              tableName,
-              fieldName,
-              value: dValue.value.value,
-              timestampField,
-            });
-            console.log(data);
-            console.log(
-              chalk.bgGreen.black(
-                `Value was successfully inserted to database ${fieldName} with value ${dValue.value.value}!`
-              )
-            );
-            console.log(
-              chalk.white('--------------------------------------------')
-            );
+            const intervalInsert = setInterval(async () => {
+              const data = await insertToTableWithField({
+                databaseConfigs,
+                tableName,
+                fieldName,
+                value: dValue.value.value,
+                timestampField,
+              });
+              if (showConsole) {
+                console.log(data);
+              }
+              console.log(
+                chalk.bgGreen.black(
+                  `Value was successfully inserted to database ${fieldName} with value ${dValue.value.value}!`
+                )
+              );
+              console.log(
+                chalk.white('--------------------------------------------')
+              );
+            }, insertInterval);
+            if (!infinite) {
+              clearInterval(intervalInsert);
+            }
           }
         } catch (error) {
           await client.disconnect();
